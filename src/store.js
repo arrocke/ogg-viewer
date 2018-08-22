@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { readFile } from "@/util";
+import OggReader from "@/ogg/reader";
 
 Vue.use(Vuex);
 
@@ -8,7 +9,8 @@ export default new Vuex.Store({
   state: {
     buffer: null,
     loaded: false,
-    loading: false
+    loading: false,
+    reader: null
   },
   mutations: {
     startLoad(state) {
@@ -20,18 +22,22 @@ export default new Vuex.Store({
     },
     setBuffer(state, buffer) {
       state.buffer = buffer;
+      state.reader = new OggReader({ buffer });
+      window.reader = state.reader;
     }
   },
   actions: {
     async loadFile({ commit }, { file }) {
       commit("startLoad");
+      let buffer = null;
       try {
-        const buffer = await readFile(file);
-        commit("setBuffer", buffer);
-        commit("endLoad", true);
+        buffer = await readFile(file);
       } catch (e) {
         commit("endLoad", false);
+        return;
       }
+      commit("setBuffer", buffer);
+      commit("endLoad", true);
     }
   }
 });
