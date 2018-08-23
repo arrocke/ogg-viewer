@@ -11,7 +11,7 @@ export default {
   components: { FilePicker },
   methods: {
     onchange(file) {
-      this.$store.dispatch("loadFile", { file });
+
     }
   }
 };
