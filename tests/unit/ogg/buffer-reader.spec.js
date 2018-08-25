@@ -56,6 +56,52 @@ describe("BufferReader", () => {
     });
   });
 
+  describe("readBytes", () => {
+    let reader, view;
+
+    beforeEach(() => {
+      const size = 10;
+      const buffer = new ArrayBuffer(size);
+      view = new DataView(buffer);
+      for (let i = 0; i < size; i++) {
+        view.setUint8(i, i);
+      }
+      reader = new BufferReader(view);
+    });
+
+    it("returns the next bytes in little endian form from the view.", () => {
+      for (let i = 0; i < view.byteLength / 2; i++) {
+        const byte = reader.readBytes(2);
+        expect(byte).toEqual((2 * i) | ((2 * i + 1) << 8));
+      }
+    });
+
+    it("returns the next bytes in big endian form from the view when flag is set.", () => {
+      for (let i = 0; i < view.byteLength / 2; i++) {
+        const byte = reader.readBytes(2, true);
+        expect(byte).toEqual(((2 * i) << 8) | (2 * i + 1));
+      }
+    });
+
+    it("moves to the next byte in the view.", () => {
+      for (let i = 0; i < view.byteLength / 2; i++) {
+        reader.readBytes(2);
+        expect(reader.bytePos).toEqual(2 * (i + 1));
+      }
+    });
+
+    it("throws exception if more than 4 bytes are requested.", () => {
+      expect(() => reader.readBytes(5)).toThrowError(RangeError);
+    });
+
+    it("throws exception if the reader is at the end of the view.", () => {
+      for (let i = 0; i < view.byteLength; i++) {
+        reader.readByte();
+      }
+      expect(() => reader.readBytes(2)).toThrowError(RangeError);
+    });
+  });
+
   describe("readDataView", () => {
     let reader, view;
 

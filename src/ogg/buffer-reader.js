@@ -1,6 +1,6 @@
 /**
  * Sequentially reads an ArrayBuffer
- * @param {ArrayBuffer|DataView} source - The buffer to read.
+ * @param {ArrayBuffer|DataView} source The buffer to read.
  */
 export default class BufferReader {
   constructor(source) {
@@ -38,8 +38,30 @@ export default class BufferReader {
   }
 
   /**
+   * Reads several bytes as a number.
+   * @param {Number} n The number of bytes to read. Must be no more than 4.
+   */
+  readBytes(n, bigEndian = false) {
+    if (n > 4) {
+      throw new RangeError("Cannot read more than 4 bytes at a time.");
+    }
+    let val = 0;
+    if (bigEndian) {
+      for (let i = 0; i < n; i++) {
+        val <<= 8;
+        val |= this.readByte();
+      }
+    } else {
+      for (let i = 0; i < n; i++) {
+        val |= (this.readByte() << (i * 8));
+      }
+    }
+    return val;
+  }
+
+  /**
    * Reads the next byteLength bytes as a DataView.
-   * @param {int} byteLength - The number of bytes to make available in the DataView.
+   * @param {int} byteLength The number of bytes to make available in the DataView.
    */
   readDataView(byteLength) {
     const view = new DataView(this._view.buffer, this._bytePos, byteLength);
