@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "U/*": ["./test/unit/*"]
+    }
+  },
+  "typeAcquisition": {
+    "include": [
+        "jest"
+    ]
+  }
+}
